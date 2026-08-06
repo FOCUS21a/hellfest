@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useLocation } from "wouter";
-
+import logoImg from "@/assets/logo.png";
 interface HeaderProps {
   language: "fr" | "en";
   onLanguageChange: (lang: "fr" | "en") => void;
@@ -32,10 +32,7 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
           onClick={() => navigate("/")}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <div className="w-8 h-8 bg-accent rounded flex items-center justify-center">
-            <span className="text-accent-foreground font-bold text-lg">H</span>
-          </div>
-          <span className="text-foreground font-bold hidden sm:inline">HELLFEST</span>
+         <img src={logoImg} alt="Logo" className="h-8 md:h-10 w-auto" />
         </button>
 
         {/* Desktop Navigation */}
