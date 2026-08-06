@@ -8,13 +8,6 @@
       "when": 1785942055450,
       "tag": "0000_last_galactus",
       "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1786051080607,
-      "tag": "0001_jittery_sheva_callister",
-      "breakpoints": true
     }
   ]
 }

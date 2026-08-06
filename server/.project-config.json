@@ -1,0 +1,42 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [
+    "db",
+    "server",
+    "user"
+  ],
+  "dev_command": "pnpm run dev",
+  "env_vars": {
+    "DATABASE_URL": "mysql://3ikJrhLn4mMo5qV.root:U71GJjV15jco5M0cfsxN@gateway05.us-east-1.prod.aws.tidbcloud.com:4000/nDmF9vBGHCnygiBxXqzTre?ssl={\"rejectUnauthorized\":true}",
+    "DRIZZLE_DATABASE_URL": "mysql://3ikJrhLn4mMo5qV.root:U71GJjV15jco5M0cfsxN@gateway05.us-east-1.prod.aws.tidbcloud.com:4000/nDmF9vBGHCnygiBxXqzTre?ssl={\"rejectUnauthorized\":true}",
+    "MANUS_WEBDEV_PROJECT_ID": "nDmF9vBGHCnygiBxXqzTre"
+  },
+  "experiments": null,
+  "git_remote": {
+    "repo_url": "https://7f0548f6b28a1758d9bf7be630d36cb4.artifacts.cloudflare.net/git/prod/nDmF9vBGHCnygiBxXqzTre.git",
+    "expiration": "2026-08-06T14:42:45.821Z",
+    "token": "art_v1_d16a407e2e4ffebe9b01b35a58170fecceb34399?expires=1786027365",
+    "backend": "GIT_BACKEND_ARTIFACTS"
+  },
+  "name": "hellfest-ticketing-clone",
+  "path": "/home/ubuntu/hellfest-ticketing-clone",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "ESyBhCgMcKFdQ47bssnmuM",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "JWT_SECRET": "2GZ2EosVZdkCEXcyNuYvmM",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "Edmond Hodonou",
+    "OWNER_OPEN_ID": "P4whGNvVj56JjkCfibS7yk",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "19d67e02-74f6-467c-9157-0f52cf0b315a",
+    "VITE_APP_ID": "nDmF9vBGHCnygiBxXqzTre",
+    "VITE_APP_LOGO": "https://files.manuscdn.com/user_upload_by_module/web_dev_logo/310519663846209545/REstCFuhDssDTKOZ.png",
+    "VITE_APP_TITLE": "Hellfest Ticketing Clone",
+    "VITE_FRONTEND_FORGE_API_KEY": "U8CMDZGwbWjdLe5TGZrT4n",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im"
+  },
+  "template_id": "web-static",
+  "test_command": "pnpm test"
+}
