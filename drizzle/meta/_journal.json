@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1785942055450,
+      "tag": "0000_last_galactus",
+      "breakpoints": true
+    }
+  ]
+}
