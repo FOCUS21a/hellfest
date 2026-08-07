@@ -64,9 +64,6 @@ export default function Hero({ language }: HeroProps) {
         </div>
       </div>
 
-      {/* Barre rouge épaisse après la bannière */}
-      <div className="h-1 bg-accent" />
-
       {/* Texte HELLFEST 2027 en blanc */}
       <div className="bg-black py-8 text-center pb-10">
         <h1 className="text-3xl md:text-5xl font-black text-white tracking-wider">
