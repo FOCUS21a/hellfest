@@ -1,4 +1,5 @@
-   import heroLogoImg from "@/assets/logo-hero.png";
+import heroBgImg from "@/assets/banner.png";
+import heroLogoImg from "@/assets/logo-hero.png";
 interface HeroProps {
   language: "fr" | "en";
 }
@@ -46,17 +47,24 @@ export default function Hero({ language }: HeroProps) {
   return (
     <div className="pt-16 min-h-screen bg-gradient-to-b from-secondary via-background to-background">
       {/* Hero Banner Section */}
-      <div className="relative h-96 md:h-[500px] overflow-hidden bg-black">
-        {/* Textured background */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlUGVybGluTm9pc2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjkiIG51bU9jdGF2ZXM9IjQiIHNlZWQ9IjIiIC8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbHRlcj0idXJsKCNub2lzZSkiIG9wYWNpdHk9IjAuMDUiLz48L3N2Zz4=')] opacity-30" />
-
-        {/* Content */}
-        <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-          <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-2xl w-auto" />
-        </div>
+    <div className="relative h-96 md:h-[500px] overflow-hidden bg-black">
+  {/* Image de fond */}
+  <img
+    src={heroBgImg}
+    alt=""
+    className="absolute inset-0 w-full h-full object-cover object-center opacity-50"
+  />
+  {/* Overlay sombre */}
+  <div className="absolute inset-0 bg-black/40" />
+        
       </div>
 
-      {/* Main Content */}
+      {/* Main{/* Content avec bordure rouge */}
+<div className="relative h-full flex flex-col items-center justify-center text-center px-4">
+  <div className="border-2 border-accent p-6 md:p-10 max-w-md md:max-w-lg">
+    <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-xs w-auto" />
+  </div>
+</div>
       <div className="container py-12 md:py-20 max-w-3xl">
         {/* Status Message */}
         <div className="mb-12 pb-8 border-b border-border">
