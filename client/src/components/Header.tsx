@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useLocation } from "wouter";
 import logoImg from "@/assets/logo.png";
+
 interface HeaderProps {
   language: "fr" | "en";
   onLanguageChange: (lang: "fr" | "en") => void;
@@ -32,27 +33,20 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
           onClick={() => navigate("/")}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-         <img src={logoImg} alt="Logo" className="h-8 md:h-10 w-auto" />
+          <img src={logoImg} alt="Logo" className="h-10 md:h-12 w-auto" />
         </button>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          <button
-            onClick={() => navigate("/espace-client")}
-            className="text-foreground hover:text-accent transition-colors"
-          >
-            {t.clientSpace}
-          </button>
-          <button
-            onClick={() => navigate("/revente")}
-            className="text-foreground hover:text-accent transition-colors"
-          >
-            {t.resale}
-          </button>
-        </nav>
-
-        {/* Language & Mobile Menu */}
+        {/* Language, HOME & Mobile Menu */}
         <div className="flex items-center gap-4">
+          {/* HOME - à côté de FR/EN */}
+          <button
+            onClick={() => navigate("/")}
+            className="text-accent font-bold text-sm tracking-wider hover:text-accent/70 transition-colors"
+          >
+            HOME
+          </button>
+
+          {/* Language Toggle */}
           <div className="flex gap-2 border-l border-border pl-4">
             <button
               onClick={() => onLanguageChange("fr")}
@@ -77,30 +71,44 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Menu Hamburger ☰ en rouge */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 hover:bg-secondary rounded transition-colors"
+            className="p-2 bg-accent text-accent-foreground rounded hover:bg-accent/80 transition-colors"
+            aria-label="Menu"
           >
             {isMenuOpen ? (
               <X className="w-5 h-5" />
             ) : (
-              <Menu className="w-5 h-5" />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
             )}
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Navigation - 3 options */}
       {isMenuOpen && (
         <nav className="md:hidden border-t border-border bg-secondary">
           <div className="container py-4 flex flex-col gap-4">
             <button
               onClick={() => {
+                navigate("/");
+                setIsMenuOpen(false);
+              }}
+              className="text-accent font-bold text-sm tracking-wider hover:text-accent/70 transition-colors text-left"
+            >
+              HOME
+            </button>
+            <button
+              onClick={() => {
                 navigate("/espace-client");
                 setIsMenuOpen(false);
               }}
-              className="text-foreground hover:text-accent transition-colors text-left"
+              className="text-accent font-bold text-sm tracking-wider hover:text-accent/70 transition-colors text-left"
             >
               {t.clientSpace}
             </button>
@@ -109,7 +117,7 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
                 navigate("/revente");
                 setIsMenuOpen(false);
               }}
-              className="text-foreground hover:text-accent transition-colors text-left"
+              className="text-accent font-bold text-sm tracking-wider hover:text-accent/70 transition-colors text-left"
             >
               {t.resale}
             </button>
