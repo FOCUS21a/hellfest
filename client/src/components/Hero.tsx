@@ -50,12 +50,11 @@ export default function Hero({ language }: HeroProps) {
 <div className="relative h-96 md:h-[500px] overflow-hidden bg-black">
   {/* Image de fond */}
   <img
-    src={heroBgImg}
-    alt=""
-    className="absolute inset-0 w-full h-full object-cover object-center opacity-50"
-  />
-  {/* Overlay sombre */}
-  <div className="absolute inset-0 bg-black/40" />
+  src={heroBgImg}
+  alt=""
+  className="absolute inset-0 w-full h-full object-cover object-center opacity-90"
+/>
+<div className="absolute inset-0 bg-black/10" />
 
   {/* Content - au centre de la bannière */}
   <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
@@ -68,7 +67,6 @@ export default function Hero({ language }: HeroProps) {
     <img src={heroLogoImg} alt="Logo" className="max-w-md sm:max-w-md md:max-w-xs w-auto" />
   </div>
 </div>
-      <div className="container py-12 md:py-20 max-w-3xl">
         {/* Status Message */}
         <div className="mb-12 pb-8 border-b border-border">
           <p className="text-foreground text-lg leading-relaxed mb-6">
