@@ -230,7 +230,7 @@ function TicketCard({
         </span>
       </div>
 
-      {ticket.status === "owned" && (
+      {(ticket.status === "owned" || generatedLink) && (
         <div className="border-t border-border pt-4 mt-4">
           {!showPrivateForm && !generatedLink && (
             <button
