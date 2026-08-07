@@ -1,5 +1,6 @@
 import heroBgImg from "@/assets/banner.png";
 import heroLogoImg from "@/assets/logo-hero.png";
+
 interface HeroProps {
   language: "fr" | "en";
 }
@@ -46,27 +47,43 @@ export default function Hero({ language }: HeroProps) {
 
   return (
     <div className="pt-16 min-h-screen bg-gradient-to-b from-secondary via-background to-background">
-      {/* Hero Banner Section */}
-<div className="relative h-96 md:h-[500px] overflow-hidden bg-black">
-  {/* Image de fond */}
-  <img
-  src={heroBgImg}
-  alt=""
-  className="absolute inset-0 w-full h-full object-cover object-center opacity-90"
-/>
-<div className="absolute inset-0 bg-black/10" />
+      {/* Hero Banner Section avec bordure rouge */}
+      <div className="relative h-96 md:h-[500px] overflow-hidden bg-black border-2 border-accent mx-4 md:mx-6 mt-2">
+        {/* Image de fond */}
+        <img
+          src={heroBgImg}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-90"
+        />
+        {/* Overlay sombre léger */}
+        <div className="absolute inset-0 bg-black/10" />
 
-  {/* Content - au centre de la bannière */}
-  <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-    <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-lg w-auto" />
-  </div>
-</div>
-      {/* Main{/* Content avec bordure rouge */}
-<div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-  <div className="border-2 border-accent p-6 md:p-10 max-w-md md:max-w-lg">
-    <img src={heroLogoImg} alt="Logo" className="max-w-md sm:max-w-md md:max-w-xs w-auto" />
-  </div>
-</div>
+        {/* Logo au centre */}
+        <div className="relative h-full flex flex-col items-center justify-center text-center px-4 pb-24">
+          <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-lg w-auto" />
+        </div>
+
+        {/* Texte HELLFEST 2027 / dates / SOLD OUT en bas de la bannière */}
+        <div className="absolute bottom-0 left-0 right-0 pb-6 text-center">
+          <h1 className="text-4xl md:text-6xl font-black text-accent tracking-wider drop-shadow-lg">
+            {t.title}
+          </h1>
+          <p className="text-lg md:text-xl text-accent/80 tracking-widest mt-1">
+            {t.subtitle}
+          </p>
+          <div className="inline-block border-2 border-accent px-6 py-2 mt-3">
+            <span className="text-accent font-black text-lg tracking-wider">
+              {t.status}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Barre rouge de séparation */}
+      <div className="h-1 bg-accent" />
+
+      {/* Main Content */}
+      <div className="container py-12 md:py-20 max-w-3xl">
         {/* Status Message */}
         <div className="mb-12 pb-8 border-b border-border">
           <p className="text-foreground text-lg leading-relaxed mb-6">
