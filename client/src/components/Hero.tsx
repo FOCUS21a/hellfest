@@ -47,7 +47,7 @@ export default function Hero({ language }: HeroProps) {
   return (
     <div className="pt-16 min-h-screen bg-gradient-to-b from-secondary via-background to-background">
       {/* Hero Banner Section */}
-    <div className="relative h-96 md:h-[500px] overflow-hidden bg-black">
+<div className="relative h-96 md:h-[500px] overflow-hidden bg-black">
   {/* Image de fond */}
   <img
     src={heroBgImg}
@@ -56,13 +56,16 @@ export default function Hero({ language }: HeroProps) {
   />
   {/* Overlay sombre */}
   <div className="absolute inset-0 bg-black/40" />
-        
-      </div>
 
+  {/* Content - au centre de la bannière */}
+  <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
+    <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-lg w-auto" />
+  </div>
+</div>
       {/* Main{/* Content avec bordure rouge */}
 <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
   <div className="border-2 border-accent p-6 md:p-10 max-w-md md:max-w-lg">
-    <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-xs w-auto" />
+    <img src={heroLogoImg} alt="Logo" className="max-w-md sm:max-w-md md:max-w-xs w-auto" />
   </div>
 </div>
       <div className="container py-12 md:py-20 max-w-3xl">
