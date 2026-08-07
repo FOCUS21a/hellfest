@@ -11,34 +11,36 @@ export default function Hero({ language }: HeroProps) {
       title: "HELLFEST 2027",
       subtitle: "DU 17 AU 20 JUIN",
       status: "SOLD OUT",
+      clientSpace: "ESPACE CLIENT",
+      resale: "REVENTE DE BILLETS",
       description:
         "Les pass 4 jours pour le festival sont épuisés. Rendez-vous début 2027 pour la vente des pass 1 jour.",
       ticketHolders: "Pour les détenteurs d'un billet Hellfest 2027, vous pouvez accéder à votre",
-      clientSpace: "Espace Client",
       actions: [
         "Modifier votre commande",
         "Activer votre option de remboursement de billet",
         "Revendre vos billets",
       ],
       resaleInfo: "Si vous souhaitez racheter des tickets sur la plateforme de revente officielle, rendez-vous sur",
-      resale: "Revente de billets",
+      resaleLink: "Revente de billets",
       resaleDate: "Il sera possible de racheter des billets dès le 8 juillet à 13h.",
     },
     en: {
       title: "HELLFEST 2027",
       subtitle: "FROM JUNE 17-20",
       status: "SOLD OUT",
+      clientSpace: "CLIENT SPACE",
+      resale: "TICKET RESALE",
       description:
         "The 4-day festival passes are sold out. See you in early 2027 for single-day pass sales.",
       ticketHolders: "For Hellfest 2027 ticket holders, you can access your",
-      clientSpace: "Client Space",
       actions: [
         "Modify your order",
         "Activate your ticket refund option",
         "Resell your tickets",
       ],
       resaleInfo: "If you want to buy tickets on the official resale platform, go to",
-      resale: "Ticket Resale",
+      resaleLink: "Ticket Resale",
       resaleDate: "It will be possible to buy tickets from July 8 at 1 PM.",
     },
   };
@@ -47,32 +49,32 @@ export default function Hero({ language }: HeroProps) {
 
   return (
     <div className="pt-16 min-h-screen bg-gradient-to-b from-secondary via-background to-background">
-      {/* Hero Banner Section avec bordure rouge */}
-      <div className="relative h-96 md:h-[500px] overflow-hidden bg-black border-2 border-accent mx-4 md:mx-6 mt-2">
+      {/* Hero Banner Section */}
+      <div className="relative h-[500px] md:h-[600px] overflow-hidden bg-black">
         {/* Image de fond */}
         <img
           src={heroBgImg}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-90"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
         {/* Overlay sombre léger */}
-        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 bg-black/20" />
 
-        {/* Logo au centre */}
-        <div className="relative h-full flex flex-col items-center justify-center text-center px-4 pb-24">
-          <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-lg w-auto" />
+        {/* Logo au centre de la bannière */}
+        <div className="relative h-full flex flex-col items-center justify-center text-center px-4 pb-28">
+          <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-2xl w-auto" />
         </div>
 
-        {/* Texte HELLFEST 2027 / dates / SOLD OUT en bas de la bannière */}
-        <div className="absolute bottom-0 left-0 right-0 pb-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-black text-accent tracking-wider drop-shadow-lg">
+        {/* Texte en bas de la bannière (en blanc) */}
+        <div className="absolute bottom-0 left-0 right-0 pb-8 text-center">
+          <h1 className="text-3xl md:text-5xl font-black text-white tracking-wider drop-shadow-lg">
             {t.title}
           </h1>
-          <p className="text-lg md:text-xl text-accent/80 tracking-widest mt-1">
+          <p className="text-base md:text-lg text-white/80 tracking-widest mt-1">
             {t.subtitle}
           </p>
-          <div className="inline-block border-2 border-accent px-6 py-2 mt-3">
-            <span className="text-accent font-black text-lg tracking-wider">
+          <div className="inline-block border border-white/50 px-5 py-1.5 mt-3">
+            <span className="text-white font-bold text-sm tracking-wider">
               {t.status}
             </span>
           </div>
@@ -95,7 +97,7 @@ export default function Hero({ language }: HeroProps) {
         <div className="mb-12 pb-8 border-b border-border">
           <p className="text-foreground mb-4">
             <span>{t.ticketHolders} </span>
-            <a href="#" className="text-accent hover:text-accent/80 transition-colors font-semibold">
+            <a href="#" className="text-accent hover:text-accent/80 transition-colors font-semibold uppercase">
               {t.clientSpace}
             </a>
             <span> {language === "fr" ? "et effectuer les actions suivantes :" : "and perform the following actions:"}</span>
@@ -114,8 +116,8 @@ export default function Hero({ language }: HeroProps) {
         <div>
           <p className="text-foreground mb-4">
             <span>{t.resaleInfo} </span>
-            <a href="#" className="text-accent hover:text-accent/80 transition-colors font-semibold">
-              {t.resale}
+            <a href="#" className="text-accent hover:text-accent/80 transition-colors font-semibold uppercase">
+              {t.resaleLink}
             </a>
             <span>.</span>
           </p>
