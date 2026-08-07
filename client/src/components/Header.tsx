@@ -26,7 +26,7 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
   const t = translations[language];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-b-2 border-b-accent">
       <div className="container flex items-center justify-between h-16">
         {/* Logo */}
         <button
@@ -47,7 +47,7 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
           </button>
 
           {/* Language Toggle */}
-          <div className="flex gap-2 border-l border-border pl-4">
+          <div className="flex gap-2 border-l border-accent pl-4">
             <button
               onClick={() => onLanguageChange("fr")}
               className={`text-sm font-medium transition-colors ${
@@ -58,7 +58,7 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
             >
               FR
             </button>
-            <span className="text-muted-foreground">/</span>
+            <span className="text-accent">/</span>
             <button
               onClick={() => onLanguageChange("en")}
               className={`text-sm font-medium transition-colors ${
@@ -90,9 +90,9 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
         </div>
       </div>
 
-      {/* Mobile Navigation - 3 options */}
+      {/* Menu déroulant - HOME + Espace Client + Revente */}
       {isMenuOpen && (
-        <nav className="md:hidden border-t border-border bg-secondary">
+        <nav className="border-t border-accent bg-secondary">
           <div className="container py-4 flex flex-col gap-4">
             <button
               onClick={() => {

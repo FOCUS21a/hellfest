@@ -58,16 +58,16 @@ export default function Hero({ language }: HeroProps) {
         {/* Overlay sombre léger */}
         <div className="absolute inset-0 bg-black/20" />
 
-        {/* Logo au centre (légèrement agrandi) */}
+        {/* Logo au centre */}
         <div className="relative h-full flex items-center justify-center text-center px-4">
           <img src={heroLogoImg} alt="Logo" className="max-w-[300px] sm:max-w-[400px] md:max-w-[500px] w-auto" />
         </div>
       </div>
 
-      {/* Barre rouge de séparation */}
+      {/* LA SEULE barre rouge de séparation */}
       <div className="h-1 bg-accent" />
 
-      {/* Texte HELLFEST 2027 en blanc, en dessous de la barre rouge */}
+      {/* Texte HELLFEST 2027 en blanc */}
       <div className="bg-black py-8 text-center">
         <h1 className="text-3xl md:text-5xl font-black text-white tracking-wider">
           {t.title}
@@ -75,52 +75,46 @@ export default function Hero({ language }: HeroProps) {
         <p className="text-base md:text-lg text-white/80 tracking-widest mt-2">
           {t.subtitle}
         </p>
-        <div className="inline-block border-2 border-white/50 px-6 py-2 mt-3">
-          <span className="text-white font-black text-lg tracking-wider">
+        <div className="inline-block border border-white/50 px-5 py-1.5 mt-3">
+          <span className="text-white font-bold text-sm tracking-wider">
             {t.status}
           </span>
         </div>
       </div>
 
-      {/* Main Content (texte original avec Espace Client et Revente en rouge) */}
-      <div className="container py-12 md:py-20 max-w-3xl">
-        {/* Status Message */}
-        <div className="mb-12 pb-8 border-b border-border">
-          <p className="text-foreground text-lg leading-relaxed mb-6">
-            {t.description}
-          </p>
-        </div>
+      {/* Texte (sans séparation entre les paragraphes) */}
+      <div className="container py-12 md:py-16 max-w-3xl">
+        {/* Description */}
+        <p className="text-foreground text-lg leading-relaxed mb-8">
+          {t.description}
+        </p>
 
-        {/* Client Space Section */}
-        <div className="mb-12 pb-8 border-b border-border">
-          <p className="text-foreground mb-4">
-            <span>{t.ticketHolders} </span>
-            <a href="#" className="text-accent hover:text-accent/80 transition-colors font-semibold">
-              {t.clientSpace}
-            </a>
-            <span> {language === "fr" ? "et effectuer les actions suivantes :" : "and perform the following actions:"}</span>
-          </p>
-          <ul className="space-y-3 ml-4">
-            {t.actions.map((action, idx) => (
-              <li key={idx} className="text-foreground/80 flex items-start gap-3">
-                <span className="text-accent font-bold mt-1">•</span>
-                <span>{action}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* Client Space */}
+        <p className="text-foreground mb-4">
+          <span>{t.ticketHolders} </span>
+          <a href="#" className="text-accent hover:text-accent/80 transition-colors font-semibold">
+            {t.clientSpace}
+          </a>
+          <span> {language === "fr" ? "et effectuer les actions suivantes :" : "and perform the following actions:"}</span>
+        </p>
+        <ul className="space-y-3 ml-4 mb-8">
+          {t.actions.map((action, idx) => (
+            <li key={idx} className="text-foreground/80 flex items-start gap-3">
+              <span className="text-accent font-bold mt-1">•</span>
+              <span>{action}</span>
+            </li>
+          ))}
+        </ul>
 
-        {/* Resale Section */}
-        <div>
-          <p className="text-foreground mb-4">
-            <span>{t.resaleInfo} </span>
-            <a href="#" className="text-accent hover:text-accent/80 transition-colors font-semibold">
-              {t.resale}
-            </a>
-            <span>.</span>
-          </p>
-          <p className="text-foreground/80 text-sm">{t.resaleDate}</p>
-        </div>
+        {/* Resale */}
+        <p className="text-foreground mb-4">
+          <span>{t.resaleInfo} </span>
+          <a href="#" className="text-accent hover:text-accent/80 transition-colors font-semibold">
+            {t.resale}
+          </a>
+          <span>.</span>
+        </p>
+        <p className="text-foreground/80 text-sm">{t.resaleDate}</p>
       </div>
     </div>
   );
