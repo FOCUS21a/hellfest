@@ -1,4 +1,4 @@
-import { ArrowLeft, Copy, Check, Link as LinkIcon, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Copy, Check, Link as LinkIcon, AlertTriangle, Clock, FileDown } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -27,7 +27,8 @@ export default function ClientSpace({ language }: ClientSpaceProps) {
       statusOwned: "En votre possession",
       statusForSale: "En cours de revente",
       statusSold: "Vendu",
-      statusTransferred: "Transféré",
+      statusTransferred: "En attente d'attribution",
+      statusReady: "Billet disponible",
     },
     en: {
       title: "Client Space",
@@ -41,7 +42,8 @@ export default function ClientSpace({ language }: ClientSpaceProps) {
       statusOwned: "In your possession",
       statusForSale: "Being resold",
       statusSold: "Sold",
-      statusTransferred: "Transferred",
+      statusTransferred: "Pending assignment",
+      statusReady: "Ticket ready",
     },
   }[language];
 
@@ -80,12 +82,20 @@ export default function ClientSpace({ language }: ClientSpaceProps) {
           <TicketsPanel language={language} t={t} />
         )}
         {isAuthenticated && user?.role === "admin" && (
-          <button
-            onClick={() => navigate("/admin/paiements")}
-            className="mt-10 text-sm text-accent hover:text-accent/80 transition-colors underline"
-          >
-            → Paiements vendeurs en attente (admin)
-          </button>
+          <div className="mt-10 flex flex-col gap-2 items-start">
+            <button
+              onClick={() => navigate("/admin/paiements")}
+              className="text-sm text-accent hover:text-accent/80 transition-colors underline"
+            >
+              → Paiements vendeurs en attente (admin)
+            </button>
+            <button
+              onClick={() => navigate("/admin/attributions")}
+              className="text-sm text-accent hover:text-accent/80 transition-colors underline"
+            >
+              → Billets en attente d'attribution (admin)
+            </button>
+          </div>
         )}
       </div>
     </div>
@@ -100,23 +110,28 @@ function TicketsPanel({
   t: Record<string, string>;
 }) {
   const [, navigate] = useLocation();
-  const { data: myTickets, isLoading, refetch } =
-    trpc.resale.getUserTickets.useQuery();
+  const { data: myTickets, isLoading, refetch } = trpc.resale.getUserTickets.useQuery();
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const statusLabel = (status: string) => {
+  const toggleSelect = (id: number) => {
+    setSelectedIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= 2) return prev; // max 2 tickets per resale
+      return [...prev, id];
+    });
+  };
+
+  const statusLabel = (status: string, pdfUrl?: string | null) => {
     switch (status) {
-      case "owned":
-        return t.statusOwned;
-      case "for_sale":
-        return t.statusForSale;
-      case "sold":
-        return t.statusSold;
-      case "transferred":
-        return t.statusTransferred;
-      default:
-        return status;
+      case "owned": return t.statusOwned;
+      case "for_sale": return t.statusForSale;
+      case "sold": return t.statusSold;
+      case "transferred": return pdfUrl ? t.statusReady : t.statusTransferred;
+      default: return status;
     }
   };
+
+  const ownedTickets = (myTickets || []).filter((tk) => tk.status === "owned");
 
   return (
     <div>
@@ -135,17 +150,42 @@ function TicketsPanel({
           </button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
-          {myTickets.map((ticket) => (
-            <TicketCard
-              key={ticket.id}
-              ticket={ticket}
+        <>
+          {ownedTickets.length > 1 && (
+            <p className="text-xs text-foreground/60 mb-4">
+              {language === "fr"
+                ? "Coche jusqu'à 2 billets pour les revendre ensemble en une seule revente."
+                : "Check up to 2 tickets to resell them together in a single listing."}
+            </p>
+          )}
+          {selectedIds.length > 0 && (
+            <SelectionResaleBar
               language={language}
-              statusLabel={statusLabel}
-              onResaleCreated={() => refetch()}
+              ticketIds={selectedIds}
+              onDone={() => {
+                setSelectedIds([]);
+                refetch();
+              }}
             />
-          ))}
-        </div>
+          )}
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
+            {myTickets.map((ticket) => (
+              <TicketCard
+                key={ticket.id}
+                ticket={ticket}
+                language={language}
+                statusLabel={statusLabel}
+                selected={selectedIds.includes(ticket.id)}
+                selectable={ticket.status === "owned"}
+                onToggleSelect={() => toggleSelect(ticket.id)}
+                onResaleCreated={() => {
+                  setSelectedIds([]);
+                  refetch();
+                }}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
@@ -155,11 +195,17 @@ function TicketCard({
   ticket,
   language,
   statusLabel,
+  selected,
+  selectable,
+  onToggleSelect,
   onResaleCreated,
 }: {
-  ticket: { id: number; ticketType: string; price: number; status: string };
+  ticket: { id: number; ticketType: string; price: number; status: string; pdfUrl?: string | null };
   language: "fr" | "en";
-  statusLabel: (status: string) => string;
+  statusLabel: (status: string, pdfUrl?: string | null) => string;
+  selected: boolean;
+  selectable: boolean;
+  onToggleSelect: () => void;
   onResaleCreated: () => void;
 }) {
   const [showPrivateForm, setShowPrivateForm] = useState(false);
@@ -184,8 +230,10 @@ function TicketCard({
       linkReady: "Lien généré — envoyez-le uniquement à votre acheteur :",
       copy: "Copier",
       copied: "Copié !",
-      warning:
-        "N'ouvrez pas ce lien vous-même : cela bloquerait temporairement (≈1h) la revente.",
+      warning: "N'ouvrez pas ce lien vous-même : cela bloquerait temporairement (≈1h) la revente.",
+      pending: "Le billet sera transmis dès que le vendeur aura confirmé la remise.",
+      download: "Télécharger le billet (PDF)",
+      select: "Inclure dans une revente groupée",
     },
     en: {
       privateResale: "Private resale",
@@ -195,15 +243,17 @@ function TicketCard({
       linkReady: "Link generated — send it only to your buyer:",
       copy: "Copy",
       copied: "Copied!",
-      warning:
-        "Do not open this link yourself: it would temporarily block (~1h) the resale.",
+      warning: "Do not open this link yourself: it would temporarily block (~1h) the resale.",
+      pending: "The ticket will be delivered once the handover is confirmed.",
+      download: "Download ticket (PDF)",
+      select: "Include in a grouped resale",
     },
   }[language];
 
   const handleGenerate = () => {
     const priceNum = Math.round(parseFloat(resalePrice) * 100);
     if (!priceNum || priceNum <= 0) return;
-    createPrivateResale.mutate({ ticketId: ticket.id, resalePrice: priceNum });
+    createPrivateResale.mutate({ ticketIds: [ticket.id], resalePrice: priceNum });
   };
 
   const handleCopy = async () => {
@@ -214,23 +264,55 @@ function TicketCard({
   };
 
   return (
-    <div className="bg-secondary border border-border rounded-lg p-6">
+    <div className={`bg-secondary border rounded-lg p-6 transition-colors ${selected ? "border-accent" : "border-border"}`}>
       <div className="flex items-start justify-between mb-4">
-        <div>
-          <p className="font-bold text-foreground">{ticket.ticketType}</p>
-          <p className="text-accent font-black text-lg">
-            {(ticket.price / 100).toLocaleString(language === "fr" ? "fr-FR" : "en-US", {
-              style: "currency",
-              currency: "EUR",
-            })}
-          </p>
+        <div className="flex items-start gap-3">
+          {selectable && (
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={onToggleSelect}
+              className="mt-1.5 w-4 h-4 accent-red-600"
+              aria-label={t.select}
+            />
+          )}
+          <div>
+            <p className="font-bold text-foreground">{ticket.ticketType}</p>
+            <p className="text-accent font-black text-lg">
+              {(ticket.price / 100).toLocaleString(language === "fr" ? "fr-FR" : "en-US", {
+                style: "currency",
+                currency: "EUR",
+              })}
+            </p>
+          </div>
         </div>
         <span className="text-xs px-2 py-1 rounded bg-background border border-border text-foreground/70 whitespace-nowrap">
-          {statusLabel(ticket.status)}
+          {statusLabel(ticket.status, ticket.pdfUrl)}
         </span>
       </div>
 
-      {ticket.status === "owned" && (
+      {ticket.status === "transferred" && (
+        <div className="border-t border-border pt-4 mt-4">
+          {ticket.pdfUrl ? (
+            <a
+              href={ticket.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-accent text-accent-foreground font-bold rounded hover:bg-accent/90 transition-colors"
+            >
+              <FileDown className="w-4 h-4" />
+              {t.download}
+            </a>
+          ) : (
+            <p className="flex items-center gap-2 text-sm text-foreground/60">
+              <Clock className="w-4 h-4 shrink-0" />
+              {t.pending}
+            </p>
+          )}
+        </div>
+      )}
+
+      {(ticket.status === "owned" || generatedLink) && (
         <div className="border-t border-border pt-4 mt-4">
           {!showPrivateForm && !generatedLink && (
             <button
@@ -254,9 +336,7 @@ function TicketCard({
                 className="w-full px-3 py-2 bg-background border border-border rounded text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
               {createPrivateResale.isError && (
-                <p className="text-xs text-destructive">
-                  {createPrivateResale.error.message}
-                </p>
+                <p className="text-xs text-destructive">{createPrivateResale.error.message}</p>
               )}
               <button
                 onClick={handleGenerate}
@@ -292,6 +372,116 @@ function TicketCard({
             </div>
           )}
         </div>
+      )}
+    </div>
+  );
+}
+function SelectionResaleBar({
+  language,
+  ticketIds,
+  onDone,
+}: {
+  language: "fr" | "en";
+  ticketIds: number[];
+  onDone: () => void;
+}) {
+  const [price, setPrice] = useState("");
+  const [link, setLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const createPrivateResale = trpc.resale.createPrivateResale.useMutation({
+    onSuccess: (result) => {
+      setLink(buildPrivateResaleUrl(window.location.origin, result.token));
+    },
+  });
+
+  const t = {
+    fr: {
+      title: `Revendre ${ticketIds.length} billet${ticketIds.length > 1 ? "s" : ""} ensemble`,
+      price: "Prix total de revente (€)",
+      generate: "Générer le lien",
+      generating: "Génération...",
+      copy: "Copier",
+      copied: "Copié !",
+      warning: "N'ouvrez pas ce lien vous-même : cela bloquerait temporairement (≈1h) la revente.",
+      done: "Terminé",
+    },
+    en: {
+      title: `Resell ${ticketIds.length} ticket${ticketIds.length > 1 ? "s" : ""} together`,
+      price: "Total resale price (€)",
+      generate: "Generate link",
+      generating: "Generating...",
+      copy: "Copy",
+      copied: "Copied!",
+      warning: "Do not open this link yourself: it would temporarily block (~1h) the resale.",
+      done: "Done",
+    },
+  }[language];
+
+  const handleGenerate = () => {
+    const priceNum = Math.round(parseFloat(price) * 100);
+    if (!priceNum || priceNum <= 0) return;
+    createPrivateResale.mutate({ ticketIds, resalePrice: priceNum });
+  };
+
+  const handleCopy = async () => {
+    if (!link) return;
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="bg-secondary border border-accent rounded-lg p-6 mb-6 max-w-4xl">
+      <p className="font-bold text-foreground mb-4">{t.title}</p>
+
+      {!link ? (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder={t.price}
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="flex-1 px-3 py-2 bg-background border border-border rounded text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+          <button
+            onClick={handleGenerate}
+            disabled={createPrivateResale.isPending}
+            className="px-4 py-2 bg-accent text-accent-foreground font-bold rounded hover:bg-accent/90 transition-colors disabled:opacity-50 whitespace-nowrap"
+          >
+            {createPrivateResale.isPending ? t.generating : t.generate}
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <input
+              readOnly
+              value={link}
+              className="flex-1 px-3 py-2 bg-background border border-border rounded text-foreground text-xs truncate"
+            />
+            <button
+              onClick={handleCopy}
+              className="shrink-0 flex items-center gap-1 px-3 py-2 bg-accent text-accent-foreground rounded font-semibold text-sm hover:bg-accent/90 transition-colors"
+            >
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copied ? t.copied : t.copy}
+            </button>
+          </div>
+          <div className="flex items-start gap-2 text-xs text-amber-500 bg-amber-500/10 border border-amber-500/30 rounded p-3">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>{t.warning}</span>
+          </div>
+          <button onClick={onDone} className="text-sm text-accent hover:text-accent/80 underline">
+            {t.done}
+          </button>
+        </div>
+      )}
+
+      {createPrivateResale.isError && (
+        <p className="text-xs text-destructive mt-2">{createPrivateResale.error.message}</p>
       )}
     </div>
   );
