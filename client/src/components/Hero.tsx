@@ -64,11 +64,11 @@ export default function Hero({ language }: HeroProps) {
         </div>
       </div>
 
-      {/* LA SEULE barre rouge de séparation */}
+      {/* Barre rouge épaisse après la bannière */}
       <div className="h-1 bg-accent" />
 
       {/* Texte HELLFEST 2027 en blanc */}
-      <div className="bg-black py-8 text-center">
+      <div className="bg-black py-8 text-center pb-10">
         <h1 className="text-3xl md:text-5xl font-black text-white tracking-wider">
           {t.title}
         </h1>
@@ -81,6 +81,9 @@ export default function Hero({ language }: HeroProps) {
           </span>
         </div>
       </div>
+
+      {/* Barre fine/légère en bas du bloc HELLFEST */}
+      <div className="h-px bg-accent/30" />
 
       {/* Texte (sans séparation entre les paragraphes) */}
       <div className="container py-12 md:py-16 max-w-3xl">
