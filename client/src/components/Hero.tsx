@@ -1,3 +1,4 @@
+   import heroLogoImg from "@/assets/logo-hero.png";
 interface HeroProps {
   language: "fr" | "en";
 }
@@ -51,17 +52,7 @@ export default function Hero({ language }: HeroProps) {
 
         {/* Content */}
         <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-5xl md:text-7xl font-black text-accent mb-2 tracking-wider drop-shadow-lg">
-            {t.title}
-          </h1>
-          <p className="text-xl md:text-2xl text-accent/80 mb-6 tracking-widest">
-            {t.subtitle}
-          </p>
-          <div className="inline-block border-2 border-accent px-6 py-2 mb-8">
-            <span className="text-accent font-black text-lg tracking-wider">
-              {t.status}
-            </span>
-          </div>
+          <img src={heroLogoImg} alt="Logo" className="max-w-xs sm:max-w-md md:max-w-2xl w-auto" />
         </div>
       </div>
 
