@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -42,6 +42,13 @@ export const tickets = mysqlTable("tickets", {
    * per Hellfest's real "carte d'achat d'origine" policy.
    */
   originStripePaymentIntentId: varchar("originStripePaymentIntentId", { length: 255 }),
+  /**
+   * Set by the admin once the buyer's ticket handover is confirmed and the
+   * downloadable PDF is ready. Until then, a resale-acquired ticket shows as
+   * "en attente d'attribution" to the buyer.
+   */
+  pdfUrl: varchar("pdfUrl", { length: 1000 }),
+  assignedAt: timestamp("assignedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -54,7 +61,8 @@ export type InsertTicket = typeof tickets.$inferInsert;
  */
 export const resales = mysqlTable("resales", {
   id: int("id").autoincrement().primaryKey(),
-  ticketId: int("ticketId").notNull().references(() => tickets.id, { onDelete: "cascade" }),
+  /** Array of ticket IDs included in this resale (1 or 2 tickets per link/listing). */
+  ticketIds: json("ticketIds").$type<number[]>().notNull(),
   sellerId: int("sellerId").notNull().references(() => users.id, { onDelete: "cascade" }),
   buyerId: int("buyerId").references(() => users.id),
   resalePrice: int("resalePrice").notNull(),

@@ -1,5 +1,7 @@
 import "dotenv/config";
 import express from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -32,7 +34,21 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  
+
+  // Behind Railway's proxy, this makes req.ip / rate-limit keys reflect the
+  // real client IP instead of Railway's internal proxy address.
+  app.set("trust proxy", 1);
+
+  // Security headers (X-Frame-Options, X-Content-Type-Options, HSTS, etc.).
+  // CSP is left off: this is a Vite-bundled SPA with inline styles/scripts
+  // that a default CSP would break; revisit with a tailored policy later.
+  app.use(helmet({ contentSecurityPolicy: false }));
+
+  // General API rate limit — generous, just blunts scripted abuse.
+  app.use("/api/trpc", rateLimit({ windowMs: 15 * 60 * 1000, max: 300 }));
+  // Tighter limit on the OAuth login/callback flow.
+  app.use("/api/oauth", rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }));
+
   // Stripe webhook must be registered BEFORE express.json() to access raw body
   app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
   

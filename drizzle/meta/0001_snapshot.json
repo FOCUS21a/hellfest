@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "fbb6c314-5e0e-4c8d-a9e0-d4e9bdee7ff0",
+  "id": "5f1ccb43-5898-4d54-961a-7dbaa3c60bfc",
   "prevId": "47d98a6c-3752-472d-b434-7a11b2f5bcdf",
   "tables": {
     "orders": {
@@ -127,9 +127,9 @@
           "notNull": true,
           "autoincrement": true
         },
-        "ticketId": {
-          "name": "ticketId",
-          "type": "int",
+        "ticketIds": {
+          "name": "ticketIds",
+          "type": "json",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -234,19 +234,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "resales_ticketId_tickets_id_fk": {
-          "name": "resales_ticketId_tickets_id_fk",
-          "tableFrom": "resales",
-          "tableTo": "tickets",
-          "columnsFrom": [
-            "ticketId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
         "resales_sellerId_users_id_fk": {
           "name": "resales_sellerId_users_id_fk",
           "tableFrom": "resales",
@@ -342,6 +329,20 @@
         "originStripePaymentIntentId": {
           "name": "originStripePaymentIntentId",
           "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pdfUrl": {
+          "name": "pdfUrl",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "assignedAt": {
+          "name": "assignedAt",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

@@ -11,6 +11,7 @@ import Billets from "./pages/Billets";
 import PrivateResale from "./pages/PrivateResale";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import AdminPayouts from "./pages/AdminPayouts";
+import AdminAssignments from "./pages/AdminAssignments";
 import { useState } from "react";
 
 function Router({ language, onLanguageChange }: { language: "fr" | "en"; onLanguageChange: (lang: "fr" | "en") => void }) {
@@ -24,6 +25,7 @@ function Router({ language, onLanguageChange }: { language: "fr" | "en"; onLangu
       <Route path={"/billets"} component={() => <Billets language={language} />} />
       <Route path={"/success"} component={() => <PaymentSuccess language={language} />} />
       <Route path={"/admin/paiements"} component={() => <AdminPayouts />} />
+      <Route path={"/admin/attributions"} component={() => <AdminAssignments />} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

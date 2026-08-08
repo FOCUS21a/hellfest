@@ -87,46 +87,14 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   const resaleId = session.metadata?.resale_id;
   const buyerId = session.metadata?.user_id;
+  const sellerId = session.metadata?.seller_id;
 
-  if (!resaleId || !buyerId) {
-    console.log("Not a resale checkout, skipping");
+  if (!resaleId || !buyerId || !sellerId) {
+    console.error("Missing metadata in checkout session");
     return;
   }
 
   try {
-    await db.update(resales)
-      .set({
-        status: "completed",
-        buyerId: parseInt(buyerId),
-        stripePaymentIntentId: session.payment_intent as string,
-        updatedAt: new Date(),
-      })
-      .where(eq(resales.id, parseInt(resaleId)));
-
-    const resaleRows = await db.select().from(resales).where(eq(resales.id, parseInt(resaleId))).limit(1);
-    if (resaleRows.length === 0) return;
-    const resaleData = resaleRows[0];
-
-    // Transfer every ticket in this resale to the buyer. Status becomes
-    // "transferred" with pdfUrl left empty — the buyer sees "en attente
-    // d'attribution" until the admin manually assigns the downloadable PDF.
-    for (const ticketId of resaleData.ticketIds) {
-      await db.update(tickets)
-        .set({
-          status: "transferred",
-          userId: parseInt(buyerId),
-          originStripePaymentIntentId: session.payment_intent as string,
-          updatedAt: new Date(),
-        })
-        .where(eq(tickets.id, ticketId));
-    }
-
-    console.log(`Resale ${resaleId} completed, ${resaleData.ticketIds.length} ticket(s) transferred, pending PDF assignment`);
-  } catch (error) {
-    console.error("Error updating resale status:", error);
-    throw error;
-  }
-}
     // Update resale status to completed
     await db.update(resales)
       .set({
@@ -145,6 +113,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       .limit(1);
 
     if (resaleData.length > 0) {
+      // Transfer every ticket in this resale to the buyer. Status becomes
+      // "transferred" with pdfUrl left empty — the buyer sees "en attente
+      // d'attribution" until the admin manually assigns the downloadable PDF.
       await db.update(tickets)
         .set({
           status: "transferred",
@@ -153,7 +124,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           originStripePaymentIntentId: session.payment_intent as string,
           updatedAt: new Date(),
         })
-        .where(inArray(tickets.id, resaleData.ticketIds));
+        .where(inArray(tickets.id, resaleData[0].ticketIds));
 
       // Money stays on the platform's Stripe balance. The seller is paid out
       // manually (bank transfer) once you've confirmed the handover went
@@ -198,7 +169,7 @@ async function handleCheckoutSessionExpired(session: Stripe.Checkout.Session) {
       .where(eq(resales.id, resaleIdNum));
     await db.update(tickets)
       .set({ status: "owned", updatedAt: now })
-      .where(eq(tickets.id, resaleData.ticketId));
+      .where(inArray(tickets.id, resaleData.ticketIds));
   } else {
     // Abandoned checkout — make the listing/link available again.
     await db.update(resales)

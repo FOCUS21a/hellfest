@@ -210,22 +210,17 @@ export const resaleRouter = router({
     const rows = await db.select({
       ticketId: tickets.id,
       ticketType: tickets.ticketType,
+      pdfUrl: tickets.pdfUrl,
       buyerName: users.name,
       buyerEmail: users.email,
       acquiredAt: tickets.updatedAt,
     })
       .from(tickets)
       .innerJoin(users, eq(tickets.userId, users.id))
-      .where(and(eq(tickets.status, "transferred")))
+      .where(eq(tickets.status, "transferred"))
       .orderBy(desc(tickets.updatedAt));
 
-    // pdfUrl is not filterable in the join above cleanly with drizzle mysql json-less
-    // column typing, so filter in JS for tickets still missing a PDF.
-    const withPdf = await db.select({ id: tickets.id, pdfUrl: tickets.pdfUrl }).from(tickets)
-      .where(eq(tickets.status, "transferred"));
-    const pdfMap = new Map(withPdf.map((t) => [t.id, t.pdfUrl]));
-
-    return rows.filter((r) => !pdfMap.get(r.ticketId));
+    return rows.filter((r) => !r.pdfUrl);
   }),
 
   /** Admin: attach the downloadable PDF link once the ticket handover is confirmed. */
