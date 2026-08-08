@@ -24,6 +24,17 @@ export function registerOAuthRoutes(app: Express) {
       return;
     }
 
+    // Guard against duplicate callback hits (double-click, browser/OS link
+    // prefetch, etc). If a valid session cookie is already present, this
+    // request is a redundant replay of one that already succeeded — just
+    // send the browser home instead of re-exchanging the (now-spent) code
+    // with Google, which would otherwise fail with "invalid_grant".
+    const existingSession = parseCookieHeader(req.headers.cookie ?? "")[COOKIE_NAME];
+    if (existingSession) {
+      res.redirect(302, "/");
+      return;
+    }
+
     // CSRF guard: the nonce in `state` must match the one-time cookie that
     // startLogin set in the browser that began this login. An attacker can
     // forge `state`, but cannot plant this cookie in the victim's browser.
@@ -98,4 +109,3 @@ export function registerOAuthRoutes(app: Express) {
     }
   });
 }
-
