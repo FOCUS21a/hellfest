@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
 import logoImg from "@/assets/logo.png";
 
 interface HeaderProps {
@@ -11,6 +12,7 @@ interface HeaderProps {
 export default function Header({ language, onLanguageChange }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [, navigate] = useLocation();
+  const { isAuthenticated, logout } = useAuth();
 
   const translations = {
     fr: {
@@ -121,6 +123,17 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
             >
               {t.resale}
             </button>
+            {isAuthenticated && (
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  logout();
+                }}
+                className="text-muted-foreground font-bold text-sm tracking-wider hover:text-foreground transition-colors text-left"
+              >
+                {language === "fr" ? "Déconnexion" : "Log out"}
+              </button>
+            )}
           </div>
         </nav>
       )}
