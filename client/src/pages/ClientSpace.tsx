@@ -314,7 +314,7 @@ function TicketCard({
         </div>
       )}
 
-      {(ticket.status === "owned" || generatedLink) && (
+      {(ticket.status === "owned" || generatedLink) && !selected && (
         <div className="border-t border-border pt-4 mt-4">
           {!showPrivateForm && !generatedLink && (
             <button
