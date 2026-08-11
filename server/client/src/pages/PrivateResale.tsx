@@ -4,19 +4,24 @@ import { ArrowLeft, Lock, Clock, ShoppingCart, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
-
 const PENDING_PRIVATE_RESALE_KEY = "pending_private_resale_token";
-
 interface PrivateResaleProps {
   language: "fr" | "en";
 }
-
 export default function PrivateResale({ language }: PrivateResaleProps) {
   const [, navigate] = useLocation();
   const params = useParams<{ token: string }>();
   const token = params.token;
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [email, setEmail] = useState("");
+
+  const utils = trpc.useUtils();
+  const emailLogin = trpc.auth.emailLogin.useMutation({
+    onSuccess: async () => {
+      await utils.auth.me.invalidate();
+    },
+  });
 
   const { data, isLoading, error } = trpc.resale.getPrivateResaleByToken.useQuery(
     { token },
@@ -46,7 +51,10 @@ export default function PrivateResale({ language }: PrivateResaleProps) {
       pendingTitle: "Achat en cours",
       pendingText: "Quelqu'un est déjà en train d'acheter ce billet. Réessayez dans quelques minutes.",
       loginPrompt: "Connectez-vous pour acheter ce billet",
-      signIn: "Se connecter",
+      signIn: "Se connecter avec Google",
+      or: "ou",
+      emailPlaceholder: "votre@email.com",
+      emailContinue: "Continuer avec cet email",
       buy: "Acheter ce billet",
       redirecting: "Redirection vers le paiement sécurisé...",
       secureNote: "Paiement sécurisé géré par la plateforme officielle Hellfest.",
@@ -71,7 +79,10 @@ export default function PrivateResale({ language }: PrivateResaleProps) {
       pendingTitle: "Purchase in progress",
       pendingText: "Someone else is already buying this ticket. Try again in a few minutes.",
       loginPrompt: "Sign in to buy this ticket",
-      signIn: "Sign in",
+      signIn: "Sign in with Google",
+      or: "or",
+      emailPlaceholder: "your@email.com",
+      emailContinue: "Continue with this email",
       buy: "Buy this ticket",
       redirecting: "Redirecting to secure payment...",
       secureNote: "Secure payment handled by the official Hellfest platform.",
@@ -101,6 +112,12 @@ export default function PrivateResale({ language }: PrivateResaleProps) {
   const handleLogin = () => {
     sessionStorage.setItem(PENDING_PRIVATE_RESALE_KEY, token);
     startLogin();
+  };
+
+  const handleEmailLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    emailLogin.mutate({ email });
   };
 
   const Shell = ({ children }: { children: React.ReactNode }) => (
@@ -194,6 +211,30 @@ export default function PrivateResale({ language }: PrivateResaleProps) {
             >
               {t.signIn}
             </button>
+
+            <div className="flex items-center gap-3 my-4">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-foreground/50">{t.or}</span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+
+            <form onSubmit={handleEmailLogin} className="flex flex-col gap-3">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder={t.emailPlaceholder}
+                className="w-full px-4 py-3 bg-background border border-border rounded text-foreground placeholder:text-foreground/40"
+              />
+              <button
+                type="submit"
+                disabled={emailLogin.isPending}
+                className="w-full px-6 py-3 border border-accent text-accent font-bold rounded hover:bg-accent/10 transition-colors disabled:opacity-50"
+              >
+                {emailLogin.isPending ? t.redirecting : t.emailContinue}
+              </button>
+            </form>
           </div>
         ) : (
           <button
@@ -224,7 +265,6 @@ export default function PrivateResale({ language }: PrivateResaleProps) {
     </Shell>
   );
 }
-
 function StatusCard({
   icon,
   title,
