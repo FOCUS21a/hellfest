@@ -111,12 +111,18 @@ function TicketsPanel({
 }) {
   const [, navigate] = useLocation();
   const { data: myTickets, isLoading, refetch } = trpc.resale.getUserTickets.useQuery();
+  const { data: myResales, refetch: refetchResales } = trpc.resale.getMyResales.useQuery();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  const resaleIdByTicketId = new Map<number, number>();
+  (myResales || []).forEach((resale) => {
+    (resale.ticketIds as number[]).forEach((tid) => resaleIdByTicketId.set(tid, resale.id));
+  });
 
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) => {
       if (prev.includes(id)) return prev.filter((x) => x !== id);
-      if (prev.length >= 2) return prev; // max 2 tickets per resale
+      if (prev.length >= 2) return prev;
       return [...prev, id];
     });
   };
@@ -158,6 +164,7 @@ function TicketsPanel({
                 : "Check up to 2 tickets to resell them together in a single listing."}
             </p>
           )}
+
           {selectedIds.length > 0 && (
             <SelectionResaleBar
               language={language}
@@ -168,6 +175,7 @@ function TicketsPanel({
               }}
             />
           )}
+
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
             {myTickets.map((ticket) => (
               <TicketCard
@@ -178,9 +186,15 @@ function TicketsPanel({
                 selected={selectedIds.includes(ticket.id)}
                 selectable={ticket.status === "owned"}
                 onToggleSelect={() => toggleSelect(ticket.id)}
+                resaleId={resaleIdByTicketId.get(ticket.id) ?? null}
                 onResaleCreated={() => {
                   setSelectedIds([]);
                   refetch();
+                  refetchResales();
+                }}
+                onResaleCancelled={() => {
+                  refetch();
+                  refetchResales();
                 }}
               />
             ))}
@@ -198,7 +212,9 @@ function TicketCard({
   selected,
   selectable,
   onToggleSelect,
+  resaleId,
   onResaleCreated,
+  onResaleCancelled,
 }: {
   ticket: { id: number; ticketType: string; price: number; status: string; pdfUrl?: string | null };
   language: "fr" | "en";
@@ -206,7 +222,9 @@ function TicketCard({
   selected: boolean;
   selectable: boolean;
   onToggleSelect: () => void;
+  resaleId: number | null;
   onResaleCreated: () => void;
+  onResaleCancelled: () => void;
 }) {
   const [showPrivateForm, setShowPrivateForm] = useState(false);
   const [resalePrice, setResalePrice] = useState("");
@@ -218,6 +236,14 @@ function TicketCard({
       const url = buildPrivateResaleUrl(window.location.origin, result.token);
       setGeneratedLink(url);
       onResaleCreated();
+    },
+  });
+
+  const cancelResale = trpc.resale.cancelResale.useMutation({
+    onSuccess: () => {
+      setGeneratedLink(null);
+      setShowPrivateForm(false);
+      onResaleCancelled();
     },
   });
 
@@ -234,6 +260,9 @@ function TicketCard({
       pending: "Le billet sera transmis dès que le vendeur aura confirmé la remise.",
       download: "Télécharger le billet (PDF)",
       select: "Inclure dans une revente groupée",
+      cancelResale: "Annuler la revente",
+      cancelling: "Annulation...",
+      cancelConfirm: "Annuler cette revente et récupérer le billet ?",
     },
     en: {
       privateResale: "Private resale",
@@ -247,6 +276,9 @@ function TicketCard({
       pending: "The ticket will be delivered once the handover is confirmed.",
       download: "Download ticket (PDF)",
       select: "Include in a grouped resale",
+      cancelResale: "Cancel resale",
+      cancelling: "Cancelling...",
+      cancelConfirm: "Cancel this resale and get the ticket back?",
     },
   }[language];
 
@@ -261,6 +293,12 @@ function TicketCard({
     await navigator.clipboard.writeText(generatedLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCancel = () => {
+    if (!resaleId) return;
+    if (!window.confirm(t.cancelConfirm)) return;
+    cancelResale.mutate({ resaleId });
   };
 
   return (
@@ -312,7 +350,22 @@ function TicketCard({
         </div>
       )}
 
-      {(ticket.status === "owned" || generatedLink) && (
+      {ticket.status === "for_sale" && resaleId && (
+        <div className="border-t border-border pt-4 mt-4">
+          <button
+            onClick={handleCancel}
+            disabled={cancelResale.isPending}
+            className="w-full px-4 py-2 border border-destructive text-destructive font-bold rounded hover:bg-destructive/10 transition-colors disabled:opacity-50"
+          >
+            {cancelResale.isPending ? t.cancelling : t.cancelResale}
+          </button>
+          {cancelResale.isError && (
+            <p className="text-xs text-destructive mt-2">{cancelResale.error.message}</p>
+          )}
+        </div>
+      )}
+
+      {(ticket.status === "owned" || generatedLink) && !selected && (
         <div className="border-t border-border pt-4 mt-4">
           {!showPrivateForm && !generatedLink && (
             <button
@@ -376,6 +429,7 @@ function TicketCard({
     </div>
   );
 }
+
 function SelectionResaleBar({
   language,
   ticketIds,

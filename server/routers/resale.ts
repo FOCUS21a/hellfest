@@ -30,6 +30,14 @@ export const resaleRouter = router({
     return db.select().from(tickets).where(eq(tickets.userId, ctx.user.id));
   }),
 
+  /** Ventes en cours (actives) du vendeur connecté, pour permettre l'annulation. */
+  getMyResales: protectedProcedure.query(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) return [];
+    return db.select().from(resales)
+      .where(and(eq(resales.sellerId, ctx.user.id), inArray(resales.status, ["available", "pending"])));
+  }),
+
   /** Create a public marketplace resale listing for 1 or 2 tickets at once. */
   createResale: protectedProcedure
     .input(z.object({
