@@ -6,7 +6,7 @@ import { eq, and, desc, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { PRIVATE_RESALE_SELF_OPEN_BLOCK_MS, PRIVATE_RESALE_TOKEN_TTL_MS } from "@shared/const";
 
-const MAX_TICKETS_PER_RESALE = 2;
+const MAX_TICKETS_PER_RESALE = 5;
 
 export const resaleRouter = router({
   getAvailable: publicProcedure

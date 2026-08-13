@@ -122,7 +122,7 @@ function TicketsPanel({
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) => {
       if (prev.includes(id)) return prev.filter((x) => x !== id);
-      if (prev.length >= 2) return prev;
+      if (prev.length >= 5) return prev;
       return [...prev, id];
     });
   };
@@ -160,8 +160,8 @@ function TicketsPanel({
           {ownedTickets.length > 1 && (
             <p className="text-xs text-foreground/60 mb-4">
               {language === "fr"
-                ? "Coche jusqu'à 2 billets pour les revendre ensemble en une seule revente."
-                : "Check up to 2 tickets to resell them together in a single listing."}
+                ? "Coche jusqu'à 5 billets pour les revendre ensemble en une seule revente."
+                : "Check up to 5 tickets to resell them together in a single listing."}
             </p>
           )}
 
